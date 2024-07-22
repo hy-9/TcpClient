@@ -16,8 +16,11 @@ class TcpClient : public QWidget
 public:
     TcpClient(QWidget *parent = nullptr);
     ~TcpClient();
+    void loadConfig();
 
 private:
     Ui::TcpClient *ui;
+    QString m_strIP;
+    quint16 m_usPort;
 };
 #endif // TCPCLIENT_H
