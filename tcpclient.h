@@ -19,10 +19,16 @@ public:
     TcpClient(QWidget *parent = nullptr);
     ~TcpClient();
     void loadConfig();
+
 public slots:
     void showConnect();
+    void rescvMsg();
+
 private slots:
-    void on_But_sender_clicked();
+
+    void on_pushButton_login_clicked();
+
+    void on_pushButton_register_clicked();
 
 private:
     Ui::TcpClient *ui;
