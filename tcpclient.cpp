@@ -1,5 +1,7 @@
 #include "tcpclient.h"
 #include "protocol.h"
+#include "opewidget.h"
+#include "OpeWidget.h"
 #include <qfile.h>
 #include <qdebug.h>
 #include <QTcpSocket>
@@ -29,6 +31,12 @@ TcpClient::~TcpClient()
     delete ui;
 }
 
+TcpClient *TcpClient::getInstance()
+{
+    static TcpClient instance;
+    return &instance;
+}
+
 void TcpClient::loadConfig()
 {
     QFile file(":/client.config");
@@ -46,6 +54,11 @@ void TcpClient::loadConfig()
     }
 }
 
+QTcpSocket *TcpClient::getTcpSocket()
+{
+    return m_tcpSocket;
+}
+
 void TcpClient::showConnect()
 {
     QMessageBox::information(this,"连接服务器","连接服务器成功");
@@ -59,6 +72,7 @@ void TcpClient::rescvMsg()
     uint uiMsgLen = uiPDULen-sizeof(PDU);
     PDU *pdu =mkPDU(uiMsgLen);
     m_tcpSocket->read((char*)pdu+sizeof(uint), uiPDULen-sizeof(uint));
+
     switch (pdu->uiMsgType) {
     case ENUM_MSG_TYPE_REGIST_RESPOND:
     {
@@ -73,9 +87,16 @@ void TcpClient::rescvMsg()
     {
         if (strcmp(pdu->caData, LOGIN_OK) == 0) {
             QMessageBox::information(this, "登录", "登录成功");
+            OpeWidget::getInstance().show();
+            hide();
         }else if(strcmp(pdu->caData, LOGIN_FAILED) == 0){
             QMessageBox::warning(this, "登录", "登录失败,用户名密码错误或重复登录。");
         }
+        break;
+    }
+    case ENUM_MSG_TYPE_ALL_ONLINE_RESPOND:{
+        OpeWidget::getInstance().pFriend()
+            ->pOnline()->showOnlie(pdu);
         break;
     }
     default:
@@ -138,4 +159,3 @@ void TcpClient::on_pushButton_register_clicked()
         QMessageBox::critical(this,"注册失败","用户名与密码不能为空");
     }
 }
-

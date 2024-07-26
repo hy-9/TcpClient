@@ -2,6 +2,7 @@
 #define TCPCLIENT_H
 
 #include <QWidget>
+#include "QTcpSocket"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -18,7 +19,9 @@ class TcpClient : public QWidget
 public:
     TcpClient(QWidget *parent = nullptr);
     ~TcpClient();
+    static TcpClient* getInstance();
     void loadConfig();
+    QTcpSocket* getTcpSocket();
 
 public slots:
     void showConnect();
