@@ -86,8 +86,8 @@ void TcpClient::rescvMsg()
     {
         if (strcmp(pdu->caData, LOGIN_OK) == 0) {
             QMessageBox::information(this, "登录", "登录成功");
-
             OpeWidget::getInstance().show();
+            emit showFriend();
             hide();
         }else if(strcmp(pdu->caData, LOGIN_FAILED) == 0){
             QMessageBox::warning(this, "登录", "登录失败,用户名密码错误或重复登录。");
@@ -121,6 +121,19 @@ void TcpClient::rescvMsg()
         }else if (strcmp(pdu->caData, ADD_FRIEND_OK) == 0) {
             QMessageBox::information(this, "添加好友", "添加好友成功");
         }
+        break;
+    }
+    case ENUM_MSG_TYPE_SHOW_FRIEND_RESPOND:{
+        OpeWidget::getInstance().pFriend()->showFriend(pdu);
+        break;
+    }
+    case ENUM_MSG_TYPE_DELETE_FRIEND_RESPOND:{
+        if (strcmp(pdu->caData, DELETE_FRIEND_OK) == 0) {
+            QMessageBox::information(this, "删除好友", "删除好友成功");
+        }else if (strcmp(pdu->caData, DELETE_FRIEND_OK) == 0) {
+            QMessageBox::information(this, "删除好友", "删除好友失败，已不为好友");
+        }
+        emit showFriend();
         break;
     }
     default:

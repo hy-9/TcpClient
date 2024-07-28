@@ -2,6 +2,7 @@
 #include "protocol.h"
 #include "tcpclient.h"
 #include <QInputDialog>
+#include <QMessageBox>
 
 Friend::Friend(QWidget *parent)
     : QWidget{parent}
@@ -48,11 +49,31 @@ Friend::Friend(QWidget *parent)
             , this, SLOT(showOnline()));
     connect(m_pSearchUsrPB, SIGNAL(clicked())
             , this, SLOT(searchUsr()));
+    connect(m_pFlushFrienPB, SIGNAL(clicked())
+            , this, SLOT(searchFriend()));
+    connect(m_pDelFriendPB, SIGNAL(clicked())
+            , this, SLOT(deleteFeriend()));
+    connect(TcpClient::getInstance(),SIGNAL(showFriend())
+            ,this,SLOT(searchFriend()));
+
 }
 
 Online *Friend::pOnline() const
 {
     return m_pOnline;
+}
+
+void Friend::showFriend(PDU *pdu)
+{
+    if (NULL == pdu) {
+        return;
+    }
+    m_pFriendListWidget->clear();
+    char caTmp[32];
+    for (int i = 0; i < pdu->uiMsgLen/32; ++i) {
+        memcpy(caTmp, (char *)pdu->caMsg+i*32, 32);
+        m_pFriendListWidget->addItem(caTmp);
+    }
 }
 
 void Friend::showOnline()
@@ -83,4 +104,39 @@ void Friend::searchUsr()
         free(pdu);
         pdu = NULL;
     }
+}
+
+void Friend::searchFriend()
+{
+    PDU *pdu = mkPDU(0);
+    pdu->uiMsgType = ENUM_MSG_TYPE_SHOW_FRIEND_REQUEST;
+    memcpy(pdu->caData, TcpClient::getInstance()->m_strName.toStdString().c_str()
+           , TcpClient::getInstance()->m_strName.size());
+    TcpClient::getInstance()->getTcpSocket()
+        ->write((char *)pdu,pdu->uiPDULen);
+    free(pdu);
+    pdu = NULL;
+}
+
+void Friend::deleteFeriend()
+{
+    if (m_pFriendListWidget->currentItem()==NULL) {
+        return;
+    }
+    QMessageBox::StandardButton btn;
+    btn = QMessageBox::question(this, "提示", "确实要好友"+m_pFriendListWidget->currentItem()->text()+"删除吗?"
+                                , QMessageBox::Yes|QMessageBox::No);
+    if (btn == QMessageBox::No) {
+        return;
+    }
+    PDU *pdu = mkPDU(0);
+    pdu->uiMsgType = ENUM_MSG_TYPE_DELETE_FRIEND_REQUEST;
+    memcpy(pdu->caData, TcpClient::getInstance()->m_strName.toStdString().c_str()
+           , TcpClient::getInstance()->m_strName.size());
+    memcpy(pdu->caData+32, m_pFriendListWidget->currentItem()->text().toStdString().c_str()
+           , m_pFriendListWidget->currentItem()->text().size());
+    TcpClient::getInstance()->getTcpSocket()
+        ->write((char *)pdu,pdu->uiPDULen);
+    free(pdu);
+    pdu = NULL;
 }

@@ -13,6 +13,8 @@ typedef unsigned int uint;
 #define ADD_FRIEND_FAILED "add friend failed"
 #define ADD_FRIEND_OK "add friend ok"
 #define ADD_FRIEND_EXIST "add friend exist"
+#define DELETE_FRIEND_OK "delete friend ok"
+#define DELETE_FRIEND_FAILED "delete friend failed"
 
 enum ENUM_MSG_TYPE{
     ENUM_MSG_TYPE_MIN=0,
@@ -32,6 +34,13 @@ enum ENUM_MSG_TYPE{
     // 加好友
     ENUM_MSG_TYPE_ADD_FRIEND_REQUEST,
     ENUM_MSG_TYPE_ADD_FRIEND_RESPOND,
+    // 显示好友
+    ENUM_MSG_TYPE_SHOW_FRIEND_REQUEST,
+    ENUM_MSG_TYPE_SHOW_FRIEND_RESPOND,
+
+    // 删除好友
+    ENUM_MSG_TYPE_DELETE_FRIEND_REQUEST,
+    ENUM_MSG_TYPE_DELETE_FRIEND_RESPOND,
 
     ENUM_MSG_TYPE_REQUEST,
     ENUM_MSG_TYPE_RESPOND,

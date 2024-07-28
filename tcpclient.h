@@ -24,6 +24,9 @@ public:
     QTcpSocket* getTcpSocket();
     QString m_strName;
 
+signals:
+    void showFriend();
+
 public slots:
     void showConnect();
     void rescvMsg();
