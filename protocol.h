@@ -10,6 +10,9 @@ typedef unsigned int uint;
 #define SEARCH_USR_NO "search usr no"
 #define SEARCH_USR_ONLINE "search usr online"
 #define SEARCH_USR_OFFLINE "search usr offline"
+#define ADD_FRIEND_FAILED "add friend failed"
+#define ADD_FRIEND_OK "add friend ok"
+#define ADD_FRIEND_EXIST "add friend exist"
 
 enum ENUM_MSG_TYPE{
     ENUM_MSG_TYPE_MIN=0,
@@ -26,6 +29,9 @@ enum ENUM_MSG_TYPE{
     // 搜索用户
     ENUM_MSG_TYPE_SEARCH_USR_REQUEST,
     ENUM_MSG_TYPE_SEARCH_USR_RESPOND,
+    // 加好友
+    ENUM_MSG_TYPE_ADD_FRIEND_REQUEST,
+    ENUM_MSG_TYPE_ADD_FRIEND_RESPOND,
 
     ENUM_MSG_TYPE_REQUEST,
     ENUM_MSG_TYPE_RESPOND,

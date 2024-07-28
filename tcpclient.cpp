@@ -86,10 +86,12 @@ void TcpClient::rescvMsg()
     {
         if (strcmp(pdu->caData, LOGIN_OK) == 0) {
             QMessageBox::information(this, "登录", "登录成功");
+
             OpeWidget::getInstance().show();
             hide();
         }else if(strcmp(pdu->caData, LOGIN_FAILED) == 0){
             QMessageBox::warning(this, "登录", "登录失败,用户名密码错误或重复登录。");
+            m_strName = NULL;
         }
         break;
     }
@@ -111,6 +113,16 @@ void TcpClient::rescvMsg()
         }
         break;
     }
+    case ENUM_MSG_TYPE_ADD_FRIEND_RESPOND:{
+        if (strcmp(pdu->caData, ADD_FRIEND_FAILED) == 0) {
+            QMessageBox::information(this, "添加好友", "添加好友失败");
+        }else if (strcmp(pdu->caData, ADD_FRIEND_EXIST) == 0) {
+            QMessageBox::information(this, "添加好友", "添加好友失败，已经为好友");
+        }else if (strcmp(pdu->caData, ADD_FRIEND_OK) == 0) {
+            QMessageBox::information(this, "添加好友", "添加好友成功");
+        }
+        break;
+    }
     default:
         break;
     }
@@ -119,32 +131,16 @@ void TcpClient::rescvMsg()
     pdu = NULL;
 }
 
-// void TcpClient::on_But_sender_clicked()
-// {
-//     QString strMsg = ui->lineEdit->text();
-//     if (!strMsg.isEmpty()) {
-//         PDU *pdu = mkPDU(strMsg.size());
-//         pdu->uiMsgType = 8888;
-//         memcpy(pdu->caMsg, strMsg.toStdString().c_str(), strMsg.size());
-//         m_tcpSocket->write((char *)pdu, pdu->uiPDULen);
-//         free(pdu);
-//         pdu = NULL;
-//     }else{
-//         QMessageBox::warning(this, "发送信息", "发送信息为空");
-//     }
-// }
-
-
 void TcpClient::on_pushButton_login_clicked()
 {
     QString strName = ui->lineEdit_userName->text();
     QString strPwd = ui->lineEdit_password->text();
     if (!strName.isEmpty() && !strPwd.isEmpty()) {
+        m_strName = strName;
         PDU *pdu = mkPDU(0);
         pdu->uiMsgType = ENUM_MSG_TYPE_LOGIN_REQUEST;
         strncpy(pdu->caData, strName.toStdString().c_str(), 32);
         strncpy(pdu->caData+32, strPwd.toStdString().c_str(), 32);
-
         m_tcpSocket->write((char *)pdu, pdu->uiPDULen);
         free(pdu);
         pdu = NULL;

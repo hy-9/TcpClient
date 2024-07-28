@@ -22,6 +22,7 @@ public:
     static TcpClient* getInstance();
     void loadConfig();
     QTcpSocket* getTcpSocket();
+    QString m_strName;
 
 public slots:
     void showConnect();
