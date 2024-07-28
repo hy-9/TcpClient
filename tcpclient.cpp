@@ -1,7 +1,6 @@
 #include "tcpclient.h"
 #include "protocol.h"
 #include "opewidget.h"
-#include "OpeWidget.h"
 #include <qfile.h>
 #include <qdebug.h>
 #include <QTcpSocket>
@@ -97,6 +96,19 @@ void TcpClient::rescvMsg()
     case ENUM_MSG_TYPE_ALL_ONLINE_RESPOND:{
         OpeWidget::getInstance().pFriend()
             ->pOnline()->showOnlie(pdu);
+        break;
+    }
+    case ENUM_MSG_TYPE_SEARCH_USR_RESPOND:{
+        if (strcmp(pdu->caData, SEARCH_USR_NO) == 0) {
+            QMessageBox::information(this, "搜索"
+                , OpeWidget::getInstance().pFriend()->m_strSearName+"不存在");
+        }else if (strcmp(pdu->caData, SEARCH_USR_ONLINE) == 0) {
+            QMessageBox::information(this, "搜索"
+                , OpeWidget::getInstance().pFriend()->m_strSearName+"在线");
+        }else if (strcmp(pdu->caData, SEARCH_USR_OFFLINE) == 0) {
+            QMessageBox::information(this, "搜索"
+                , OpeWidget::getInstance().pFriend()->m_strSearName+"不在线");
+        }
         break;
     }
     default:
