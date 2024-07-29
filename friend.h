@@ -19,6 +19,7 @@ public:
     explicit Friend(QWidget *parent = nullptr);
     Online *pOnline() const;
     void showFriend(PDU *pdu);
+    void showFriendChar(PDU *pdu);
     QString m_strSearName;
 private:
     QTextEdit *m_pShowMsgTE;
@@ -40,6 +41,8 @@ public slots:
     void searchUsr();
     void searchFriend();
     void deleteFeriend();
+    void showChar();
+    void senderChar();
 };
 
 #endif // FRIEND_H

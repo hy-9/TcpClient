@@ -135,6 +135,17 @@ void TcpClient::rescvMsg()
         }
         emit showFriend();
         break;
+    }case ENUM_MSG_TYPE_SHOW_CHAR_RESPOND:{
+        OpeWidget::getInstance().pFriend()
+            ->showFriendChar(pdu);
+        break;
+    }case ENUM_MSG_TYPE_SENDER_CHAR_RESPOND:{
+        if (strcmp(pdu->caData, SENDER_CHAR_FAILED) == 0) {
+            QMessageBox::information(this, "发送信息", "发送失败");
+            break;
+        }
+        emit showChar();
+        break;
     }
     default:
         break;
