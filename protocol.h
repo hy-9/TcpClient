@@ -17,6 +17,9 @@ typedef unsigned int uint;
 #define DELETE_FRIEND_FAILED "delete friend failed"
 #define SENDER_CHAR_OK "sender char ok"
 #define SENDER_CHAR_FAILED "sender char failed"
+#define CREAT_DIR_OK "creat dir ok"
+#define CREAT_DIR_PATH_NO "creat dir failed path no"
+#define CREAT_DIR_PATH_REP "creat dir failed path repetition"
 
 enum ENUM_MSG_TYPE{
     ENUM_MSG_TYPE_MIN=0,
@@ -51,6 +54,10 @@ enum ENUM_MSG_TYPE{
     // 发送信息
     ENUM_MSG_TYPE_SENDER_CHAR_REQUEST,
     ENUM_MSG_TYPE_SENDER_CHAR_RESPOND,
+
+    // 创建文件夹
+    ENUM_MSG_TYPE_CREAT_DIR_REQUEST,
+    ENUM_MSG_TYPE_CREAT_DIR_RESPOND,
 
     ENUM_MSG_TYPE_REQUEST,
     ENUM_MSG_TYPE_RESPOND,

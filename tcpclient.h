@@ -23,6 +23,7 @@ public:
     void loadConfig();
     QTcpSocket* getTcpSocket();
     QString m_strName;
+    QString m_strCurPuath;
 
 signals:
     void showFriend();

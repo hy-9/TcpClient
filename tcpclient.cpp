@@ -85,6 +85,7 @@ void TcpClient::rescvMsg()
     case ENUM_MSG_TYPE_LOGIN_RESPOND:
     {
         if (strcmp(pdu->caData, LOGIN_OK) == 0) {
+            m_strCurPuath = QString("./%1").arg(m_strName);
             QMessageBox::information(this, "登录", "登录成功");
             OpeWidget::getInstance().show();
             emit showFriend();
@@ -145,6 +146,13 @@ void TcpClient::rescvMsg()
             break;
         }
         emit showChar();
+        break;
+    }case ENUM_MSG_TYPE_CREAT_DIR_RESPOND:{
+        if (strcmp(pdu->caData, CREAT_DIR_PATH_NO) == 0) {
+            QMessageBox::information(this, "创建文件夹", "路径不存在");
+        }else if (strcmp(pdu->caData, CREAT_DIR_PATH_REP) == 0) {
+            QMessageBox::information(this, "创建文件夹", "文件夹已存在");
+        }
         break;
     }
     default:

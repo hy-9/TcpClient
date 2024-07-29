@@ -13,6 +13,9 @@ public:
 
 signals:
 
+public slots:
+    void createDir();
+
 private:
     QListWidget *m_pResListW;
     QPushButton *m_pReturnPB;
