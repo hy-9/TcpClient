@@ -1,9 +1,11 @@
 #include "resource.h"
-#include "protocol.h"
+
 #include "tcpclient.h"
+#include "OpeWidget.h"
 #include <QVBoxLayout>
 #include <QInputDialog>
 #include <QMessageBox>
+#include <QListWidgetItem>
 
 Resource::Resource(QWidget *parent)
     : QWidget{parent}
@@ -42,6 +44,31 @@ Resource::Resource(QWidget *parent)
     setLayout(pMain);
     connect(m_pCreateDirPB, SIGNAL(clicked())
             , this, SLOT(createDir()));
+    connect(m_pFlushFilePB, SIGNAL(clicked())
+            , this, SLOT(flushFile()));
+    connect(TcpClient::getInstance(), SIGNAL(showFlie())
+            , this, SLOT(flushFile()));
+}
+
+void Resource::showFlie(PDU *pdu)
+{
+    if (NULL == pdu) {
+        return;
+    }
+    m_pResListW->clear();
+    FLIE *flie = NULL;
+    for (int i = 0; i < pdu->uiMsgLen/sizeof(FLIE); ++i) {
+        flie = (FLIE *)(pdu->caMsg)+i;
+        QListWidgetItem *item = new QListWidgetItem;
+        item->setText(QString("%1").arg(flie->flieName));
+        if (flie->isDir) {
+            item->setIcon(QIcon(QPixmap(":/resource/dir.png")));
+        }else{
+            item->setIcon(QIcon(QPixmap(":/resource/flie.png")));
+        }
+        item->setToolTip(QString("%1KB").arg(flie->flieSize));
+        m_pResListW->addItem(item);
+    }
 }
 
 void Resource::createDir()
@@ -67,4 +94,15 @@ void Resource::createDir()
     free(pdu);
     pdu = NULL;
 
+}
+
+void Resource::flushFile()
+{
+    PDU *pdu = mkPDU(TcpClient::getInstance()->m_strCurPuath.size()+1);
+    pdu->uiMsgType = ENUM_MSG_TYPE_SHOW_FLIE_REQUEST;
+    memcpy(pdu->caMsg, TcpClient::getInstance()->m_strCurPuath.toStdString().c_str()
+           , TcpClient::getInstance()->m_strCurPuath.size());
+    TcpClient::getInstance()->getTcpSocket()->write((char *)pdu, pdu->uiPDULen);
+    free(pdu);
+    pdu = NULL;
 }

@@ -28,6 +28,7 @@ public:
 signals:
     void showFriend();
     void showChar();
+    void showFlie();
 
 public slots:
     void showConnect();

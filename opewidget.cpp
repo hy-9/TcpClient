@@ -22,8 +22,12 @@ OpeWidget::OpeWidget(QWidget *parent)
     pMain->addWidget(m_pSW);
 
     setLayout(pMain);
+
+    // emit showFlie();
     connect(m_pListW, SIGNAL(currentRowChanged(int))
             , m_pSW, SLOT(setCurrentIndex(int)));
+    // connect(m_pListW, SIGNAL(currentRowChanged(int))
+    //         , this, SLOT(showFlie()));
 }
 
 OpeWidget &OpeWidget::getInstance()
@@ -35,4 +39,9 @@ OpeWidget &OpeWidget::getInstance()
 Friend *OpeWidget::pFriend() const
 {
     return m_pFriend;
+}
+
+Resource *OpeWidget::pResource() const
+{
+    return m_pResource;
 }

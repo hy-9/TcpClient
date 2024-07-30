@@ -89,6 +89,7 @@ void TcpClient::rescvMsg()
             QMessageBox::information(this, "登录", "登录成功");
             OpeWidget::getInstance().show();
             emit showFriend();
+            emit showFlie();
             hide();
         }else if(strcmp(pdu->caData, LOGIN_FAILED) == 0){
             QMessageBox::warning(this, "登录", "登录失败,用户名密码错误或重复登录。");
@@ -153,6 +154,9 @@ void TcpClient::rescvMsg()
         }else if (strcmp(pdu->caData, CREAT_DIR_PATH_REP) == 0) {
             QMessageBox::information(this, "创建文件夹", "文件夹已存在");
         }
+        break;
+    }case ENUM_MSG_TYPE_SHOW_FLIE_RESPOND:{
+        OpeWidget::getInstance().pResource()->showFlie(pdu);
         break;
     }
     default:

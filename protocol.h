@@ -59,9 +59,23 @@ enum ENUM_MSG_TYPE{
     ENUM_MSG_TYPE_CREAT_DIR_REQUEST,
     ENUM_MSG_TYPE_CREAT_DIR_RESPOND,
 
+    // 显示文件
+    ENUM_MSG_TYPE_SHOW_FLIE_REQUEST,
+    ENUM_MSG_TYPE_SHOW_FLIE_RESPOND,
+
     ENUM_MSG_TYPE_REQUEST,
     ENUM_MSG_TYPE_RESPOND,
     ENUM_MSG_TYPE_MAX=0x00ffffff,
+};
+
+struct FLIE
+{
+    //文件名
+    char flieName[32];
+    // 文件类型
+    int isDir;
+    // 文件大小
+    int flieSize;
 };
 
 struct PDU

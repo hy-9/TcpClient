@@ -17,6 +17,10 @@ public:
     static OpeWidget& getInstance();
     Friend *pFriend() const;
 
+    Resource *pResource() const;
+
+signals:
+    void showFlie();
 private:
     QListWidget *m_pListW;
     Friend *m_pFriend;
