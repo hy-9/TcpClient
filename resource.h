@@ -18,12 +18,13 @@ signals:
 public slots:
     void createDir();
     void flushFile();
+    void deleteFlie();
 
 private:
     QListWidget *m_pResListW;
     QPushButton *m_pReturnPB;
     QPushButton *m_pCreateDirPB;
-    QPushButton *m_pDelDirPB;
+    // QPushButton *m_pDelDirPB;
     QPushButton *m_pRenamePB;
     QPushButton *m_pFlushFilePB;
     QPushButton *m_pUploadPB;

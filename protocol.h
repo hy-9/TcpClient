@@ -20,6 +20,9 @@ typedef unsigned int uint;
 #define CREAT_DIR_OK "creat dir ok"
 #define CREAT_DIR_PATH_NO "creat dir failed path no"
 #define CREAT_DIR_PATH_REP "creat dir failed path repetition"
+#define DELETE_FLIE_OK "delete dlie ok"
+#define DELETE_FLIE_FAILED "delete dlie failed"
+
 
 enum ENUM_MSG_TYPE{
     ENUM_MSG_TYPE_MIN=0,
@@ -62,6 +65,10 @@ enum ENUM_MSG_TYPE{
     // 显示文件
     ENUM_MSG_TYPE_SHOW_FLIE_REQUEST,
     ENUM_MSG_TYPE_SHOW_FLIE_RESPOND,
+
+    // 删除文件
+    ENUM_MSG_TYPE_DELETE_FLIE_REQUEST,
+    ENUM_MSG_TYPE_DELETE_FLIE_RESPOND,
 
     ENUM_MSG_TYPE_REQUEST,
     ENUM_MSG_TYPE_RESPOND,

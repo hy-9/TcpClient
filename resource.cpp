@@ -14,14 +14,14 @@ Resource::Resource(QWidget *parent)
     m_pResListW = new QListWidget;
     m_pReturnPB = new QPushButton("返回");
     m_pCreateDirPB = new QPushButton("创建文件夹");
-    m_pDelDirPB = new QPushButton("删除文件夹");
+    // m_pDelDirPB = new QPushButton("删除文件夹");
     m_pRenamePB = new QPushButton("重命名文件夹");
     m_pFlushFilePB = new QPushButton("刷新文件夹");
 
     QVBoxLayout *pDirVBL = new QVBoxLayout;
     pDirVBL->addWidget(m_pReturnPB);
     pDirVBL->addWidget(m_pCreateDirPB);
-    pDirVBL->addWidget(m_pDelDirPB);
+    // pDirVBL->addWidget(m_pDelDirPB);
     pDirVBL->addWidget(m_pRenamePB);
     pDirVBL->addWidget(m_pFlushFilePB);
 
@@ -46,6 +46,8 @@ Resource::Resource(QWidget *parent)
             , this, SLOT(createDir()));
     connect(m_pFlushFilePB, SIGNAL(clicked())
             , this, SLOT(flushFile()));
+    connect(m_pDelFilePB, SIGNAL(clicked())
+            , this, SLOT(deleteFlie()));
     connect(TcpClient::getInstance(), SIGNAL(showFlie())
             , this, SLOT(flushFile()));
 }
@@ -102,6 +104,28 @@ void Resource::flushFile()
     pdu->uiMsgType = ENUM_MSG_TYPE_SHOW_FLIE_REQUEST;
     memcpy(pdu->caMsg, TcpClient::getInstance()->m_strCurPuath.toStdString().c_str()
            , TcpClient::getInstance()->m_strCurPuath.size());
+    TcpClient::getInstance()->getTcpSocket()->write((char *)pdu, pdu->uiPDULen);
+    free(pdu);
+    pdu = NULL;
+}
+
+void Resource::deleteFlie()
+{
+    if (m_pResListW->currentItem()==NULL) {
+        QMessageBox::warning(this, "删除文件", "选择要删除文件");
+        return;
+    }
+    QString flieName = m_pResListW->currentItem()->text();
+    QMessageBox::StandardButton btn;
+    btn = QMessageBox::question(this, "删除文件", "确定要删除文件"+flieName+"吗?(其包含文件将一并删除)"
+                                , QMessageBox::Yes|QMessageBox::No);
+    if (btn == QMessageBox::No) {
+        return;
+    }
+    PDU *pdu = mkPDU(TcpClient::getInstance()->m_strCurPuath.size()+1);
+    pdu->uiMsgType = ENUM_MSG_TYPE_DELETE_FLIE_REQUEST;
+    strcpy((char *)pdu->caMsg, TcpClient::getInstance()->m_strCurPuath.toStdString().c_str());
+    strcpy(pdu->caData, flieName.toStdString().c_str());
     TcpClient::getInstance()->getTcpSocket()->write((char *)pdu, pdu->uiPDULen);
     free(pdu);
     pdu = NULL;

@@ -89,7 +89,7 @@ void TcpClient::rescvMsg()
             QMessageBox::information(this, "登录", "登录成功");
             OpeWidget::getInstance().show();
             emit showFriend();
-            emit showFlie();
+            // emit showFlie();
             hide();
         }else if(strcmp(pdu->caData, LOGIN_FAILED) == 0){
             QMessageBox::warning(this, "登录", "登录失败,用户名密码错误或重复登录。");
@@ -157,6 +157,15 @@ void TcpClient::rescvMsg()
         break;
     }case ENUM_MSG_TYPE_SHOW_FLIE_RESPOND:{
         OpeWidget::getInstance().pResource()->showFlie(pdu);
+        break;
+    }case ENUM_MSG_TYPE_DELETE_FLIE_RESPOND:{
+        if (strcmp(pdu->caData, DELETE_FLIE_OK) == 0) {
+            QMessageBox::warning(this, "文件删除", "删除成功");
+            emit showFlie();
+        }else if(strcmp(pdu->caData, DELETE_FLIE_FAILED) == 0){
+            QMessageBox::warning(this, "文件删除", "删除失败");
+            emit showFlie();
+        }
         break;
     }
     default:
