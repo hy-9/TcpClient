@@ -20,6 +20,7 @@ public slots:
     void flushFile();
     void deleteFlie();
     void renNameFlie();
+    void enterDir(QListWidgetItem* item);
 
 private:
     QListWidget *m_pResListW;

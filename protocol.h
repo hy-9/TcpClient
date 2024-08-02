@@ -24,7 +24,9 @@ typedef unsigned int uint;
 #define DELETE_FLIE_FAILED "delete dlie failed"
 #define RENNAME_FLIE_OK "ren name flie ok"
 #define RENNAME_FLIE_FAILED "ren name flie failed"
-
+#define DIR_ENTER_OK "dir enter ok"
+#define DIR_ENTER_FAILED "dir enter failed"
+#define DIR_INEXISTENCE "dir inexistence"
 
 enum ENUM_MSG_TYPE{
     ENUM_MSG_TYPE_MIN=0,
@@ -75,6 +77,13 @@ enum ENUM_MSG_TYPE{
     // 重命名文件
     ENUM_MSG_TYPE_RENNAME_FLIE_REQUEST,
     ENUM_MSG_TYPE_RENNAME_FLIE_RESPOND,
+
+    // 进入文件夹
+    ENUM_MSG_TYPE_ENTER_DIR_REQUEST,
+    ENUM_MSG_TYPE_ENTER_DIR_RESPOND,
+
+    // 路径
+    ENUM_MSG_TYPE_PATH,
 
     ENUM_MSG_TYPE_REQUEST,
     ENUM_MSG_TYPE_RESPOND,

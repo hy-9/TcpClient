@@ -174,6 +174,25 @@ void TcpClient::rescvMsg()
             QMessageBox::warning(this, "重命名", "重命名失败");
             emit showFlie();
         }
+        break;
+    }case ENUM_MSG_TYPE_ENTER_DIR_RESPOND:{
+        if (strcmp(pdu->caData, DIR_INEXISTENCE) == 0) {
+            QMessageBox::warning(this, "进入文件夹", "文件夹不存在");
+            emit showFlie();
+        }else if (strcmp(pdu->caData, DIR_ENTER_FAILED) == 0) {
+            //QMessageBox::warning(this, "进入文件夹", "失败");
+            emit showFlie();
+        }else if (strcmp(pdu->caData, DIR_ENTER_OK) == 0) {
+            m_strCurPuath = QString("%1").arg((char *)pdu->caMsg);
+            //qDebug()<<m_strCurPuath;
+            emit showFlie();
+        }
+        break;
+    }case ENUM_MSG_TYPE_PATH:{
+        m_strCurPuath = QString("%1").arg((char *)pdu->caMsg);
+        qDebug()<<m_strCurPuath;
+        emit showFlie();
+        break;
     }
     default:
         break;

@@ -52,6 +52,8 @@ Resource::Resource(QWidget *parent)
             , this, SLOT(flushFile()));
     connect(m_pRenamePB, SIGNAL(clicked())
             , this, SLOT(renNameFlie()));
+    connect(m_pResListW, SIGNAL(itemDoubleClicked(QListWidgetItem*))
+            , this, SLOT(enterDir(QListWidgetItem *)));
 }
 
 void Resource::showFlie(PDU *pdu)
@@ -154,6 +156,20 @@ void Resource::renNameFlie()
     memcpy(pdu->caData, strOldNameFlie.toStdString().c_str()
            , 32);
     memcpy(pdu->caData+32, strNewNameFlie.toStdString().c_str()
+           , 32);
+    strcpy((char *)pdu->caMsg, TcpClient::getInstance()->m_strCurPuath.toStdString().c_str());
+    TcpClient::getInstance()->getTcpSocket()->write((char *)pdu, pdu->uiPDULen);
+    free(pdu);
+    pdu = NULL;
+}
+
+void Resource::enterDir(QListWidgetItem *item)
+{
+    QString strDir = m_pResListW->currentItem()->text();
+    // qDebug()<<strDir;
+    PDU *pdu = mkPDU(TcpClient::getInstance()->m_strCurPuath.size()+1);
+    pdu->uiMsgType = ENUM_MSG_TYPE_ENTER_DIR_REQUEST;
+    memcpy(pdu->caData, strDir.toStdString().c_str()
            , 32);
     strcpy((char *)pdu->caMsg, TcpClient::getInstance()->m_strCurPuath.toStdString().c_str());
     TcpClient::getInstance()->getTcpSocket()->write((char *)pdu, pdu->uiPDULen);
