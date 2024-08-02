@@ -19,6 +19,7 @@ public slots:
     void createDir();
     void flushFile();
     void deleteFlie();
+    void renNameFlie();
 
 private:
     QListWidget *m_pResListW;

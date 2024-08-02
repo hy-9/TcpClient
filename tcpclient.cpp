@@ -167,6 +167,13 @@ void TcpClient::rescvMsg()
             emit showFlie();
         }
         break;
+    }case ENUM_MSG_TYPE_RENNAME_FLIE_RESPOND:{
+        if (strcmp(pdu->caData, RENNAME_FLIE_OK) == 0) {
+            emit showFlie();
+        }else if(strcmp(pdu->caData, RENNAME_FLIE_FAILED) == 0){
+            QMessageBox::warning(this, "重命名", "重命名失败");
+            emit showFlie();
+        }
     }
     default:
         break;

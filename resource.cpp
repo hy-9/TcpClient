@@ -15,7 +15,7 @@ Resource::Resource(QWidget *parent)
     m_pReturnPB = new QPushButton("返回");
     m_pCreateDirPB = new QPushButton("创建文件夹");
     // m_pDelDirPB = new QPushButton("删除文件夹");
-    m_pRenamePB = new QPushButton("重命名文件夹");
+    m_pRenamePB = new QPushButton("重命名文件");
     m_pFlushFilePB = new QPushButton("刷新文件夹");
 
     QVBoxLayout *pDirVBL = new QVBoxLayout;
@@ -50,6 +50,8 @@ Resource::Resource(QWidget *parent)
             , this, SLOT(deleteFlie()));
     connect(TcpClient::getInstance(), SIGNAL(showFlie())
             , this, SLOT(flushFile()));
+    connect(m_pRenamePB, SIGNAL(clicked())
+            , this, SLOT(renNameFlie()));
 }
 
 void Resource::showFlie(PDU *pdu)
@@ -126,6 +128,34 @@ void Resource::deleteFlie()
     pdu->uiMsgType = ENUM_MSG_TYPE_DELETE_FLIE_REQUEST;
     strcpy((char *)pdu->caMsg, TcpClient::getInstance()->m_strCurPuath.toStdString().c_str());
     strcpy(pdu->caData, flieName.toStdString().c_str());
+    TcpClient::getInstance()->getTcpSocket()->write((char *)pdu, pdu->uiPDULen);
+    free(pdu);
+    pdu = NULL;
+}
+
+void Resource::renNameFlie()
+{
+    if (m_pResListW->currentItem()==NULL) {
+        QMessageBox::warning(this, "重命名文件", "选择要重命名文件");
+        return;
+    }
+    QString strOldNameFlie = m_pResListW->currentItem()->text();
+    QString strNewNameFlie = QInputDialog::getText(this, "重命名文件 "+strOldNameFlie, "新文件名");
+    if (strNewNameFlie.isEmpty()) {
+        QMessageBox::warning(this, "重命名文件", "新文件名不能为空");
+        return ;
+    }
+    if (strNewNameFlie.size()>32) {
+        QMessageBox::warning(this, "重命名文件", "新文件名过长");
+        return ;
+    }
+    PDU *pdu = mkPDU(TcpClient::getInstance()->m_strCurPuath.size()+1);
+    pdu->uiMsgType = ENUM_MSG_TYPE_RENNAME_FLIE_REQUEST;
+    memcpy(pdu->caData, strOldNameFlie.toStdString().c_str()
+           , 32);
+    memcpy(pdu->caData+32, strNewNameFlie.toStdString().c_str()
+           , 32);
+    strcpy((char *)pdu->caMsg, TcpClient::getInstance()->m_strCurPuath.toStdString().c_str());
     TcpClient::getInstance()->getTcpSocket()->write((char *)pdu, pdu->uiPDULen);
     free(pdu);
     pdu = NULL;

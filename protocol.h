@@ -22,6 +22,8 @@ typedef unsigned int uint;
 #define CREAT_DIR_PATH_REP "creat dir failed path repetition"
 #define DELETE_FLIE_OK "delete dlie ok"
 #define DELETE_FLIE_FAILED "delete dlie failed"
+#define RENNAME_FLIE_OK "ren name flie ok"
+#define RENNAME_FLIE_FAILED "ren name flie failed"
 
 
 enum ENUM_MSG_TYPE{
@@ -69,6 +71,10 @@ enum ENUM_MSG_TYPE{
     // 删除文件
     ENUM_MSG_TYPE_DELETE_FLIE_REQUEST,
     ENUM_MSG_TYPE_DELETE_FLIE_RESPOND,
+
+    // 重命名文件
+    ENUM_MSG_TYPE_RENNAME_FLIE_REQUEST,
+    ENUM_MSG_TYPE_RENNAME_FLIE_RESPOND,
 
     ENUM_MSG_TYPE_REQUEST,
     ENUM_MSG_TYPE_RESPOND,
