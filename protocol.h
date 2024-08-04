@@ -27,6 +27,10 @@ typedef unsigned int uint;
 #define DIR_ENTER_OK "dir enter ok"
 #define DIR_ENTER_FAILED "dir enter failed"
 #define DIR_INEXISTENCE "dir inexistence"
+#define FILE_CREAT_OK "file creat ok"
+#define FILE_CREAT_FAILED "file creat failed"
+#define UPLOAD_DATA_OK "upload data ok"
+#define UPLOAD_DATA_FAILED "upload data failed"
 
 enum ENUM_MSG_TYPE{
     ENUM_MSG_TYPE_MIN=0,
@@ -81,6 +85,14 @@ enum ENUM_MSG_TYPE{
     // 进入文件夹
     ENUM_MSG_TYPE_ENTER_DIR_REQUEST,
     ENUM_MSG_TYPE_ENTER_DIR_RESPOND,
+
+    // 上传文件
+    ENUM_MSG_TYPE_UPLOAD_FILE_REQUEST,
+    ENUM_MSG_TYPE_UPLOAD_FILE_RESPOND,
+
+    // 上传数据
+    ENUM_MSG_TYPE_UPLOAD_DATA_REQUEST,
+    ENUM_MSG_TYPE_UPLOAD_DATA_RESPOND,
 
     // 路径
     ENUM_MSG_TYPE_PATH,

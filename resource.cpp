@@ -6,17 +6,18 @@
 #include <QInputDialog>
 #include <QMessageBox>
 #include <QListWidgetItem>
+#include <QFileDialog>
 
 Resource::Resource(QWidget *parent)
     : QWidget{parent}
 {
-
+    m_pPathLb = new QLabel;
     m_pResListW = new QListWidget;
     m_pReturnPB = new QPushButton("返回");
     m_pCreateDirPB = new QPushButton("创建文件夹");
     // m_pDelDirPB = new QPushButton("删除文件夹");
     m_pRenamePB = new QPushButton("重命名文件");
-    m_pFlushFilePB = new QPushButton("刷新文件夹");
+    m_pFlushFilePB = new QPushButton("刷新文件");
 
     QVBoxLayout *pDirVBL = new QVBoxLayout;
     pDirVBL->addWidget(m_pReturnPB);
@@ -36,10 +37,17 @@ Resource::Resource(QWidget *parent)
     pFileVBL->addWidget(m_pDelFilePB);
     pFileVBL->addWidget(m_pShareFilePB);
 
+    QVBoxLayout *pPath = new QVBoxLayout;
+    pPath->addWidget(m_pPathLb);
+    pPath->addWidget(m_pResListW);
+
     QHBoxLayout *pMain = new QHBoxLayout;
-    pMain->addWidget(m_pResListW);
+    pMain->addLayout(pPath);
     pMain->addLayout(pDirVBL);
     pMain->addLayout(pFileVBL);
+
+    m_pthread = new MyThread(this);
+
 
     setLayout(pMain);
     connect(m_pCreateDirPB, SIGNAL(clicked())
@@ -50,10 +58,24 @@ Resource::Resource(QWidget *parent)
             , this, SLOT(deleteFlie()));
     connect(TcpClient::getInstance(), SIGNAL(showFlie())
             , this, SLOT(flushFile()));
+    connect(TcpClient::getInstance(), SIGNAL(upLoadFile())
+            , this, SLOT(upLoadFileData()));
     connect(m_pRenamePB, SIGNAL(clicked())
             , this, SLOT(renNameFlie()));
     connect(m_pResListW, SIGNAL(itemDoubleClicked(QListWidgetItem*))
             , this, SLOT(enterDir(QListWidgetItem *)));
+    connect(m_pReturnPB, SIGNAL(clicked())
+            , this, SLOT(returnSuperior()));
+    connect(m_pUploadPB, SIGNAL(clicked())
+            , this, SLOT(uploadFlie()));
+    connect(m_pthread, SIGNAL(sigShowMsg())
+            , this ,SLOT(showErr()));
+    connect(m_pthread, SIGNAL(senderPDU(PDU*))
+            , this ,SLOT(senderPDU(PDU*)));
+    // QMessageBox::warning(this, "上传文件", "上传失败，读文件失败");
+
+
+
 }
 
 void Resource::showFlie(PDU *pdu)
@@ -104,6 +126,7 @@ void Resource::createDir()
 
 void Resource::flushFile()
 {
+    m_pPathLb->setText(TcpClient::getInstance()->m_strCurPuath);
     PDU *pdu = mkPDU(TcpClient::getInstance()->m_strCurPuath.size()+1);
     pdu->uiMsgType = ENUM_MSG_TYPE_SHOW_FLIE_REQUEST;
     memcpy(pdu->caMsg, TcpClient::getInstance()->m_strCurPuath.toStdString().c_str()
@@ -176,3 +199,103 @@ void Resource::enterDir(QListWidgetItem *item)
     free(pdu);
     pdu = NULL;
 }
+
+void Resource::returnSuperior()
+{
+    if(strcmp(TcpClient::getInstance()->m_strCurPuath.toStdString().c_str(),
+               QString("./%1").arg(TcpClient::getInstance()->m_strName).toStdString().c_str()) == 0){
+        QMessageBox::warning(this, "返回上级", "已处于上级");
+        return;
+    }
+    int index = TcpClient::getInstance()->m_strCurPuath.lastIndexOf('/');
+    TcpClient::getInstance()->m_strCurPuath.remove(index
+                                                   ,TcpClient::getInstance()->m_strCurPuath.size()-index);
+    flushFile();
+}
+
+void Resource::uploadFlie()
+{
+    if (!m_strUploadFliePath.isEmpty()) {
+        QMessageBox::warning(this, "上传文件", m_strUploadFliePath+" 正在上传");
+        return;
+    }
+    m_strUploadFliePath = QFileDialog::getOpenFileName();
+    if (m_strUploadFliePath.isEmpty()) {
+        QMessageBox::warning(this, "上传文件","上传文件名不能为空");
+        return;
+    }
+    int index = m_strUploadFliePath.lastIndexOf('/');
+    QString strFileName = m_strUploadFliePath.right(m_strUploadFliePath.size()-index-1);
+    qDebug()<<strFileName;
+    QFile file(m_strUploadFliePath);
+    qint64 fileSize = file.size();
+    file.close();
+    PDU *pdu = mkPDU(TcpClient::getInstance()->m_strCurPuath.size()+1);
+    memcpy(pdu->caMsg ,TcpClient::getInstance()->m_strCurPuath.toStdString().c_str(), TcpClient::getInstance()->m_strCurPuath.size());
+    sprintf(pdu->caData, "%s %lld", strFileName.toStdString().c_str(), fileSize);
+    pdu->uiMsgType = ENUM_MSG_TYPE_UPLOAD_FILE_REQUEST;
+    TcpClient::getInstance()->getTcpSocket()->write((char *)pdu, pdu->uiPDULen);
+    free(pdu);
+    pdu = NULL;
+}
+
+void Resource::upLoadFileData()
+{
+    QMessageBox::warning(this, "上传文件", " 正在上传");
+    m_pthread->m_strUploadFliePath = OpeWidget::getInstance().pResource()->m_strUploadFliePath;
+    m_pthread->start();
+}
+
+void Resource::showErr()
+{
+    QMessageBox::warning(this, "上传文件", "上传失败，读文件失败");
+}
+
+void Resource::senderPDU(PDU *pdu)
+{
+    qDebug()<<"数据发送";
+    TcpClient::getInstance()->getTcpSocket()->write((char *)pdu, pdu->uiPDULen);
+}
+MyThread::MyThread(QObject *parent)
+{
+
+}
+
+void MyThread::run()
+{
+    QFile file(m_strUploadFliePath);
+    file.open(QIODevice::ReadOnly);
+    qint64 fileSize = file.size();
+    char *pBuffer = new char[4096];
+    qint64 ret = 0;
+    while (true) {
+        ret = file.read(pBuffer, 4096);
+        if (ret<=4096 && ret>0) {
+
+            PDU *pdu = mkPDU(ret);
+            pdu->uiMsgType = ENUM_MSG_TYPE_UPLOAD_DATA_REQUEST;
+            strcpy((char *)pdu->caMsg, pBuffer);
+            int index = OpeWidget::getInstance().pResource()->m_strUploadFliePath.lastIndexOf('/');
+            QString strFileName = OpeWidget::getInstance().pResource()->m_strUploadFliePath
+                                      .right(OpeWidget::getInstance().pResource()->m_strUploadFliePath.size()-index-1);
+            sprintf(pdu->caData, "%s %lld", strFileName.toStdString().c_str(), fileSize);
+            emit senderPDU(pdu);
+            msleep(5);
+            qDebug()<<strFileName<<ret;
+            free(pdu);
+            pdu = NULL;
+        }else if(ret == 0){
+            qDebug()<<"文件发送完成";
+            break;
+        }else{
+            emit sigShowMsg();
+            break;
+        }
+    }
+    file.close();
+    delete []pBuffer;
+    pBuffer = NULL;
+    OpeWidget::getInstance().pResource()->m_strUploadFliePath=NULL;
+    quit();
+}
+

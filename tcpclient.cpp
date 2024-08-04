@@ -193,6 +193,24 @@ void TcpClient::rescvMsg()
         qDebug()<<m_strCurPuath;
         emit showFlie();
         break;
+    }case ENUM_MSG_TYPE_UPLOAD_FILE_RESPOND:{
+        if (strcmp(pdu->caData, FILE_CREAT_OK) == 0) {
+            QMessageBox::warning(this, "文件上传", "文件创建成功");
+            emit upLoadFile();
+        }else if (strcmp(pdu->caData, FILE_CREAT_FAILED) == 0) {
+            QMessageBox::warning(this, "文件上传", "上传失败，文件以存在");
+            OpeWidget::getInstance().pResource()->m_strUploadFliePath = NULL;
+            emit showFlie();
+        }
+        break;
+    }case ENUM_MSG_TYPE_UPLOAD_DATA_RESPOND:{
+        if (strcmp(pdu->caData, UPLOAD_DATA_OK) == 0) {
+            QMessageBox::warning(this, "文件上传", "文件上传成功");
+            emit showFlie();
+        }else if (strcmp(pdu->caData, FILE_CREAT_FAILED) == 0) {
+            QMessageBox::warning(this, "文件上传", "上传失败");
+            emit showFlie();
+        }
     }
     default:
         break;

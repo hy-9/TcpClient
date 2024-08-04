@@ -24,11 +24,14 @@ public:
     QTcpSocket* getTcpSocket();
     QString m_strName;
     QString m_strCurPuath;
+    QString m_strIP;
+    quint16 m_usPort;
 
 signals:
     void showFriend();
     void showChar();
     void showFlie();
+    void upLoadFile();
 
 public slots:
     void showConnect();
@@ -42,8 +45,7 @@ private slots:
 
 private:
     Ui::TcpClient *ui;
-    QString m_strIP;
-    quint16 m_usPort;
+
 
     QTcpSocket *m_tcpSocket;
 };
